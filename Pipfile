@@ -1,0 +1,16 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[packages]
+transformers = ">=4.41"
+torch = "*"
+torchaudio = "*"
+soundfile = "*"
+requests = "*"
+huggingface_hub = "*"
+"pyannote.audio" = ">=3.1"
+
+[requires]
+python_version = "3.11"
