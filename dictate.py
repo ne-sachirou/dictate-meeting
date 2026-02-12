@@ -85,15 +85,16 @@ def diarize(
 ) -> list[Segment]:
     diarization_pipeline = Pipeline.from_pretrained(
         "pyannote/speaker-diarization-3.1",
-        use_auth_token=hf_token,
+        token=hf_token,
     )
     if torch.cuda.is_available():
         diarization_pipeline.to(torch.device("cuda"))
 
-    diarization = diarization_pipeline(
+    diarization_result = diarization_pipeline(
         {"waveform": waveform, "sample_rate": sample_rate},
         num_speakers=2, # NOTE: 會議には常に2人が參加してゐるを假定してゐる
     )
+    diarization = getattr(diarization_result, "speaker_diarization", diarization_result)
 
     segments: list[Segment] = []
     for turn, _, speaker in diarization.itertracks(yield_label=True):
