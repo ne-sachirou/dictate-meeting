@@ -84,7 +84,7 @@ def diarize(
     hf_token: str,
 ) -> list[Segment]:
     diarization_pipeline = Pipeline.from_pretrained(
-        "pyannote/speaker-diarization-3.1",
+        "pyannote/speaker-diarization-community-1",
         token=hf_token,
     )
     if torch.cuda.is_available():
