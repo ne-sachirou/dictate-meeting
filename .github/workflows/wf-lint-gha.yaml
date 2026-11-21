@@ -1,0 +1,31 @@
+---
+name: Lint GitHub Actions
+
+"on":
+  workflow_call:
+    inputs:
+      reporter:
+        description: reviewdogのreporter
+        required: true
+        type: string
+
+jobs:
+  lint-gha-reviewdog:
+    name: lint-gha-reviewdog
+    permissions:
+      checks: write
+      contents: read
+      pull-requests: write
+    timeout-minutes: 10
+    runs-on: ubuntu-26.04
+    steps:
+      - name: コードをチェックアウト
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: GitHub Actionsをlint
+        uses: ne-sachirou/lint-gha-reviewdog@7de88fec59e1c9530b7dccd5e9f51594f8b2278b # v0.0.15
+        with:
+          fail_on_error: true
+          github_token: ${{github.token}}
+          reporter: ${{ inputs.reporter }}

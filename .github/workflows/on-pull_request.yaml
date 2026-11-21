@@ -1,0 +1,75 @@
+---
+name: on pull_request
+
+"on":
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint-gha:
+    permissions:
+      checks: write
+      contents: read
+      pull-requests: write
+    uses: ./.github/workflows/wf-lint-gha.yaml # zizmor: ignore[self-repository]
+    with:
+      reporter: >-
+        ${{ github.event.pull_request.head.repo.fork && 'local' || 'github-pr-review' }}
+
+  pipenv-sync-macos:
+    name: Pipfile.lock を macOS で検證
+    # RenovateはLinuxでlockを生成し、macOSに無いCUDA系packageを固定してしまふ。
+    # macOSで pipenv sync できない差分は、Renovate の PR なら lock を再生成して
+    # push し、それ以外は失敗させて氣附けるやうにする。
+    permissions:
+      contents: write
+    timeout-minutes: 20
+    runs-on: macos-15
+    env:
+      IS_RENOVATE: >-
+        ${{ github.event.pull_request.user.login == 'renovate[bot]' &&
+        !github.event.pull_request.head.repo.fork }}
+    steps:
+      - name: コードをチェックアウト
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # Renovate の PR は branch に push するため、merge commit ではなく head を使ふ。
+          ref: ${{ env.IS_RENOVATE == 'true' && github.event.pull_request.head.ref || '' }}
+          persist-credentials: false
+      - name: Pythonをインストール
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
+        with:
+          python-version-file: Pipfile
+      - name: pipenv をインストール
+        run: python -m pip install pipenv
+      - name: pipenv sync
+        id: sync
+        continue-on-error: ${{ env.IS_RENOVATE == 'true' }}
+        run: pipenv sync
+      - name: Pipfile.lock を macOS で再生成
+        if: env.IS_RENOVATE == 'true' && steps.sync.outcome == 'failure'
+        run: pipenv lock
+      - name: 再生成した Pipfile.lock で pipenv sync
+        if: env.IS_RENOVATE == 'true' && steps.sync.outcome == 'failure'
+        run: pipenv sync
+      - name: 再生成した Pipfile.lock を push
+        if: env.IS_RENOVATE == 'true' && steps.sync.outcome == 'failure'
+        env:
+          # GITHUB_TOKEN での push は workflow を再實行しない。
+          # required check を滿たすには、secret に PAT か GitHub App の token を置く。
+          PUSH_TOKEN: ${{ secrets.RELOCK_PUSH_TOKEN || github.token }}
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+        run: |
+          if git diff --quiet -- Pipfile.lock; then
+            echo "::error::pipenv sync に失敗したが Pipfile.lock に差分が無い"
+            exit 1
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'macOSでPipfile.lockを再生成' -- Pipfile.lock
+          git push \
+            "https://x-access-token:${PUSH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" \
+            "HEAD:refs/heads/${HEAD_REF}"
