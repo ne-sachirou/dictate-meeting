@@ -19,8 +19,8 @@ class Segment:
 def build_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description=(
-            "Whisper (kotoba-tech/kotoba-whisper-v2.2) で日本語音声を文字起こしし、"
-            "2人分の話者ラベル付きでテキストファイルに保存します。"
+            "Whisper (kotoba-tech/kotoba-whisper-v2.2) で日本語音聲を文字起こしし、"
+            "2人分の話者ラベル附きでテキストファイルに保存します。"
         )
     )
     parser.add_argument("wav_path", type=Path, help="入力 WAV ファイルのパス")
@@ -34,13 +34,13 @@ def build_arg_parser() -> argparse.ArgumentParser:
         "--chunk-seconds",
         type=int,
         default=30,
-        help="長時間音声の分割秒数（デフォルト: 30）",
+        help="長時閒音聲の分割秒數（デフォルト: 30）",
     )
     parser.add_argument(
         "--stride-seconds",
         type=int,
         default=5,
-        help="チャンク間の重なり秒数（デフォルト: 5）",
+        help="チャンク閒の重なり秒數（デフォルト: 5）",
     )
     parser.add_argument(
         "--batch-size",
@@ -52,7 +52,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
         "--hf-token",
         type=str,
         default=None,
-        help="Hugging Face のアクセストークン（未指定なら環境変数 HF_TOKEN から取得）",
+        help="Hugging Face のアクセストークン（未指定なら環境變數 HF_TOKEN から取得）",
     )
     return parser
 
@@ -68,7 +68,7 @@ def require_hf_token(cli_token: str | None) -> str:
     if not token:
         raise SystemExit(
             "Hugging Face のアクセストークンが必要です。"
-            " --hf-token か環境変数 HF_TOKEN を設定してください。"
+            " --hf-token か環境變數 HF_TOKEN を設定してください。"
         )
     return token
 
