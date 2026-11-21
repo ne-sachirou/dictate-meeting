@@ -67,8 +67,7 @@ def require_hf_token(cli_token: str | None) -> str:
     token = cli_token or os.environ.get("HF_TOKEN") or os.environ.get("HUGGINGFACE_TOKEN")
     if not token:
         raise SystemExit(
-            "Hugging Face のアクセストークンが必要です。"
-            " --hf-token か環境變數 HF_TOKEN を設定してください。"
+            "Hugging Face のアクセストークンが必要です。" " --hf-token か環境變數 HF_TOKEN を設定してください。"
         )
     return token
 
@@ -92,7 +91,7 @@ def diarize(
 
     diarization_result = diarization_pipeline(
         {"waveform": waveform, "sample_rate": sample_rate},
-        num_speakers=2, # NOTE: 會議には常に2人が參加してゐるを假定してゐる
+        num_speakers=2,  # NOTE: 會議には常に2人が參加してゐるを假定してゐる
     )
     diarization = getattr(diarization_result, "speaker_diarization", diarization_result)
 
