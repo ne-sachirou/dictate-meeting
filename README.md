@@ -13,8 +13,8 @@ ffmpeg -i ./*.mp4 \
        meeting.wav
 
 set +x
-#F05452E2822D="$(echo -n '云々' | openssl enc -e -aes-256-cbc -pbkdf2 -base64 -pass 'pass:c00e7cdf-c137-4f4a-9ded-35824c740814')"
-HF_TOKEN="$(echo "$F05452E2822D" | openssl enc -d -aes-256-cbc -pbkdf2 -base64 -pass 'pass:c00e7cdf-c137-4f4a-9ded-35824c740814')"
+#云々="$(echo -n '云々' | openssl enc -e -aes-256-cbc -pbkdf2 -base64 -pass 'pass:云々')"
+HF_TOKEN="$(echo "$云々" | openssl enc -d -aes-256-cbc -pbkdf2 -base64 -pass 'pass:云々')"
 set -x
 export HF_TOKEN
 export DYLD_LIBRARY_PATH="/opt/homebrew/opt/ffmpeg@9/lib:${DYLD_LIBRARY_PATH:-}"
