@@ -27,7 +27,7 @@ jobs:
     permissions:
       contents: write
     timeout-minutes: 20
-    runs-on: macos-15
+    runs-on: macos-26
     env:
       IS_RENOVATE: >-
         ${{ github.event.pull_request.user.login == 'renovate[bot]' &&
